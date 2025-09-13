@@ -1,14 +1,12 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
-
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import Dashboard from './pages/Dashboard';
-import BooksPage from './pages/BooksPage';
-import CategoriesPage from './pages/CategoriesPage';
-import TransactionsPage from './pages/TransactionsPage';
-import UsersPage from './pages/UsersPage';
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import Dashboard from "./pages/Dashboard";
+import BooksPage from "./pages/BooksPage";
+import CategoriesPage from "./pages/CategoriesPage";
+import TransactionsPage from "./pages/TransactionsPage";
+import UsersPage from "./pages/UsersPage";
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();

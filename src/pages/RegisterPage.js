@@ -1,148 +1,115 @@
-import React, { useState } from 'react';
-import api from '../utils/api';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { FiUser, FiMail, FiLock, FiCheckSquare } from "react-icons/fi";
+import { motion } from "framer-motion";
+import api from "../utils/api";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-
   const [form, setForm] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'Member',
-    memberType: '',
+    name: "",
+    email: "",
+    password: "",
+    role: "Member",
+    memberType: "",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
-  const handleChange = e => {
+  const handleChange = e =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
   const handleSubmit = async e => {
     e.preventDefault();
     try {
-      await api.post('/auth/register', form);
-      navigate('/login');
+      await api.post("/auth/register", form);
+      navigate("/login");
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || "Registration failed");
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-tr from-indigo-600 to-purple-700 px-4">
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="min-h-screen flex items-center justify-center bg-gradient-to-tr from-indigo-600 to-purple-700 px-4"
+    >
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md rounded-lg bg-white p-8 shadow-lg"
+        className="max-w-md w-full bg-white p-10 rounded-xl shadow-lg"
       >
-        <h2 className="mb-8 text-center text-3xl font-extrabold text-gray-900">
-          Create your account
+        <h2 className="text-center text-3xl font-semibold text-gray-900 mb-8">
+          Create Your Account
         </h2>
 
         {error && (
-          <div className="mb-4 rounded bg-red-100 px-4 py-3 text-red-700">{error}</div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-6 p-3 bg-red-100 text-red-700 rounded"
+          >
+            {error}
+          </motion.div>
         )}
 
-        <label htmlFor="name" className="block text-sm font-semibold text-gray-700">
-          Full Name
-        </label>
-        <input
-          id="name"
-          name="name"
-          type="text"
-          required
-          value={form.name}
-          onChange={handleChange}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="John Doe"
-        />
+        <Input icon={FiUser} name="name" placeholder="Full Name" value={form.name} onChange={handleChange} required />
+        <Input icon={FiMail} name="email" type="email" placeholder="Email Address" value={form.email} onChange={handleChange} required />
+        <Input icon={FiLock} name="password" type="password" placeholder="Password" value={form.password} onChange={handleChange} required />
 
-        <label
-          htmlFor="email"
-          className="mt-6 block text-sm font-semibold text-gray-700"
-        >
-          Email address
+        <label className="block mb-6">
+          <span className="text-gray-700 font-semibold mb-1 flex items-center">
+            <FiCheckSquare className="mr-2" /> Role
+          </span>
+          <select
+            name="role"
+            value={form.role}
+            onChange={handleChange}
+            className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          >
+            <option>Member</option>
+            <option>Librarian</option>
+            <option>Admin</option>
+          </select>
         </label>
-        <input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={form.email}
-          onChange={handleChange}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="you@example.com"
-        />
 
-        <label
-          htmlFor="password"
-          className="mt-6 block text-sm font-semibold text-gray-700"
-        >
-          Password
-        </label>
         <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          value={form.password}
-          onChange={handleChange}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Enter your password"
-        />
-
-        <label
-          htmlFor="role"
-          className="mt-6 block text-sm font-semibold text-gray-700"
-        >
-          Role
-        </label>
-        <select
-          id="role"
-          name="role"
-          value={form.role}
-          onChange={handleChange}
-          className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-        >
-          <option value="Member">Member</option>
-          <option value="Librarian">Librarian</option>
-          <option value="Admin">Admin</option>
-        </select>
-
-        <label
-          htmlFor="memberType"
-          className="mt-6 block text-sm font-semibold text-gray-700"
-        >
-          Member Type (optional)
-        </label>
-        <input
-          id="memberType"
           name="memberType"
-          type="text"
+          placeholder="Member Type (optional)"
           value={form.memberType}
           onChange={handleChange}
-          className="mt-1 mb-4 w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-          placeholder="Optional member type"
+          className="w-full rounded border border-gray-300 px-3 py-2 mb-6 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
 
         <button
           type="submit"
-          className="mt-4 w-full rounded-md bg-indigo-600 py-3 text-white shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+          className="w-full bg-indigo-600 text-white py-3 rounded font-semibold shadow hover:bg-indigo-700 transition-colors"
         >
           Register
         </button>
 
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <Link
-            to="/login"
-            className="font-semibold text-indigo-600 hover:text-indigo-500"
-          >
+        <p className="mt-6 text-center text-gray-600">
+          Already have an account?{" "}
+          <Link to="/login" className="text-indigo-600 hover:underline">
             Sign in here
           </Link>
         </p>
       </form>
+    </motion.div>
+  );
+}
+
+// Reusable Input component with icon
+function Input({ icon: Icon, ...props }) {
+  return (
+    <div className="relative mb-6">
+      {Icon && (
+        <Icon className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+      )}
+      <input
+        {...props}
+        className="w-full rounded border border-gray-300 pl-10 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
     </div>
   );
 }

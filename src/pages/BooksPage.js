@@ -1,30 +1,32 @@
-import React, { useEffect, useState } from 'react';
-import api from '../utils/api';
-import BookForm from '../components/BookForm';
-import { useAuth } from '../contexts/AuthContext';
+import React, { useEffect, useState } from "react";
+import api from "../utils/api";
+import BookForm from "../components/BookForm";
+import { useAuth } from "../contexts/AuthContext";
+import { FiTrash2, FiEdit } from "react-icons/fi";
+import { motion } from "framer-motion";
 
 export default function BooksPage() {
   const { user } = useAuth();
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [editingBook, setEditingBook] = useState(null);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const fetchBooks = async () => {
     try {
-      const { data } = await api.get('/books');
+      const { data } = await api.get("/books");
       setBooks(data);
     } catch {
-      setError('Failed to load books');
+      setError("Failed to load books");
     }
   };
 
   const fetchCategories = async () => {
     try {
-      const { data } = await api.get('/categories');
+      const { data } = await api.get("/categories");
       setCategories(data);
     } catch {
-      setError('Failed to load categories');
+      setError("Failed to load categories");
     }
   };
 
@@ -33,22 +35,29 @@ export default function BooksPage() {
     fetchCategories();
   }, []);
 
-  const handleDelete = async id => {
-    if (!window.confirm('Are you sure you want to delete this book?')) return;
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this book?")) return;
     try {
       await api.delete(`/books/${id}`);
       fetchBooks();
     } catch {
-      setError('Failed to delete book');
+      setError("Failed to delete book");
     }
   };
 
   return (
-    <div className="min-h-screen bg-indigo-50 p-8">
-      <h2 className="mb-6 text-3xl font-bold text-indigo-800">Books</h2>
-      {error && <p className="mb-4 rounded bg-red-100 p-3 text-red-700">{error}</p>}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="container mx-auto p-6 bg-white rounded-lg shadow-lg"
+    >
+      {error && (
+        <div className="mb-4 rounded bg-red-100 p-3 text-red-700">{error}</div>
+      )}
 
-      {(user.role === 'Admin' || user.role === 'Librarian') && (
+      <h1 className="text-3xl font-bold mb-6">Books</h1>
+
+      {(user.role === "Admin" || user.role === "Librarian") && (
         <BookForm
           categories={categories}
           editingBook={editingBook}
@@ -60,56 +69,64 @@ export default function BooksPage() {
         />
       )}
 
-      <div className="overflow-x-auto rounded-lg bg-white shadow">
-        <table className="w-full">
-          <thead className="bg-indigo-200 text-indigo-900">
-            <tr>
-              <th className="px-6 py-3 text-left font-semibold uppercase">Title</th>
-              <th className="px-6 py-3 text-left font-semibold uppercase">Author</th>
-              <th className="px-6 py-3 text-left font-semibold uppercase">Category</th>
-              <th className="px-6 py-3 text-center font-semibold uppercase">Stock</th>
-              <th className="px-6 py-3 text-center font-semibold uppercase">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-indigo-100 text-indigo-900">
-            {books.map(book => (
-              <tr key={book._id} className="hover:bg-indigo-100">
-                <td className="px-6 py-4">{book.title}</td>
-                <td className="px-6 py-4">{book.author}</td>
-                <td className="px-6 py-4">{book.category?.category_name || 'N/A'}</td>
-                <td className="px-6 py-4 text-center">{book.stock}</td>
-                <td className="px-6 py-4 flex justify-center space-x-3">
-                  {(user.role === 'Admin' || user.role === 'Librarian') && (
-                    <>
-                      <button
-                        onClick={() => setEditingBook(book)}
-                        className="rounded bg-yellow-400 px-3 py-1 font-semibold text-white hover:bg-yellow-500"
-                      >
-                        Edit
-                      </button>
-                      {user.role === 'Admin' && (
-                        <button
-                          onClick={() => handleDelete(book._id)}
-                          className="rounded bg-red-600 px-3 py-1 font-semibold text-white hover:bg-red-700"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {books.length === 0 && (
-              <tr>
-                <td colSpan="5" className="text-center px-6 py-4 text-indigo-700">
-                  No books found.
-                </td>
-              </tr>
+      <table className="w-full table-auto mt-8 border-collapse border border-gray-300">
+        <thead>
+          <tr className="bg-indigo-100">
+            <th className="border border-gray-300 p-2 text-left">Title</th>
+            <th className="border border-gray-300 p-2 text-left">Author</th>
+            <th className="border border-gray-300 p-2 text-left">Category</th>
+            <th className="border border-gray-300 p-2 text-left">Stock</th>
+            {(user.role === "Admin" || user.role === "Librarian") && (
+              <th className="border border-gray-300 p-2 text-left">Actions</th>
             )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </tr>
+        </thead>
+        <tbody>
+          {books.length > 0 ? (
+            books.map((book) => (
+              <tr key={book._id} className="hover:bg-indigo-50">
+                <td className="border border-gray-300 p-2">{book.title}</td>
+                <td className="border border-gray-300 p-2">{book.author}</td>
+                <td className="border border-gray-300 p-2">
+                  {book.category?.category_name || "N/A"}
+                </td>
+                <td className="border border-gray-300 p-2">{book.stock}</td>
+                {(user.role === "Admin" || user.role === "Librarian") && (
+                  <td className="border border-gray-300 p-2 space-x-3">
+                    <button
+                      onClick={() => setEditingBook(book)}
+                      aria-label="Edit Book"
+                      className="text-indigo-600 hover:text-indigo-900"
+                      title="Edit"
+                    >
+                      <FiEdit size={20} />
+                    </button>
+                    {user.role === "Admin" && (
+                      <button
+                        onClick={() => handleDelete(book._id)}
+                        aria-label="Delete Book"
+                        className="text-red-600 hover:text-red-900"
+                        title="Delete"
+                      >
+                        <FiTrash2 size={20} />
+                      </button>
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td
+                colSpan={user.role === "Admin" || user.role === "Librarian" ? 5 : 4}
+                className="p-4 text-center italic text-gray-500"
+              >
+                No books found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </motion.div>
   );
 }

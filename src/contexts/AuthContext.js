@@ -1,36 +1,33 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../utils/api';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import api from "../utils/api";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
+    const stored = localStorage.getItem("user");
+    return stored ? JSON.parse(stored) : null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('token'));
+  const [token, setToken] = useState(() => localStorage.getItem("token"));
 
   useEffect(() => {
-    if (token) {
-      localStorage.setItem('token', token);
-    } else {
-      localStorage.removeItem('token');
-    }
+    if (token) localStorage.setItem("token", token);
+    else localStorage.removeItem("token");
   }, [token]);
 
   useEffect(() => {
-    if (user) {
-      localStorage.setItem('user', JSON.stringify(user));
-    } else {
-      localStorage.removeItem('user');
-    }
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
   }, [user]);
 
   const login = async (email, password) => {
-    const { data } = await api.post('/auth/login', { email, password });
-    setToken(data.token);
-    const userInfo = parseJwt(data.token);
-    setUser(userInfo);
+    try {
+      const { data } = await api.post("/auth/login", { email, password });
+      setToken(data.token);
+      setUser(parseJwt(data.token));
+    } catch (error) {
+      throw error;
+    }
   };
 
   const logout = () => {
@@ -47,7 +44,7 @@ export const AuthProvider = ({ children }) => {
 
 function parseJwt(token) {
   try {
-    return JSON.parse(atob(token.split('.')[1]));
+    return JSON.parse(atob(token.split(".")[1]));
   } catch {
     return null;
   }
